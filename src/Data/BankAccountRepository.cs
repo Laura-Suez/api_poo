@@ -13,7 +13,12 @@ public class BankAccountRepository : IBankAccountRepository
 {
     // static hace que exista una única lista compartida por todas las instancias
     // del repositorio creadas por la aplicación.
-    private static List<BankAccount> _accounts = [];
+    private readonly AppDbContext _context;
+
+    public BankAccountRepository(AppDbContext context)
+    {
+        _context = context;
+    }
 
     // Busca una cuenta por su número. Aunque el método recibe un int, la entidad
     // guarda Number como string, por eso convertimos el id a texto para comparar.
@@ -21,7 +26,7 @@ public class BankAccountRepository : IBankAccountRepository
     // porque el contrato de la interfaz declara un BankAccount no nullable.
     public BankAccount GetById(int id)
     {
-        return _accounts.FirstOrDefault(account => account.Number == id.ToString())
+        return _context.BankAccounts.FirstOrDefault(account => account.Number == id.ToString())
             ?? throw new KeyNotFoundException($"Bank account con id {id}  not found.");
     }
 
@@ -29,31 +34,26 @@ public class BankAccountRepository : IBankAccountRepository
     // interna y permite que el repositorio conserve el control de sus datos.
     public List<BankAccount> List()
     {
-        return _accounts.ToList();
+        return _context.BankAccounts.ToList();
     }
 
     // Agrega una nueva entidad a la colección y devuelve la misma cuenta agregada.
     public BankAccount Add(BankAccount entity)
     {
-        _accounts.Add(entity);
+        _context.BankAccounts.Add(entity);
         return entity;
     }
 
     // Reemplaza la cuenta existente que tenga el mismo número.
     public void Update(BankAccount entity)
     {
-        var index = _accounts.FindIndex(account => account.Number == entity.Number);
-        if (index >= 0)
-        {
-            // Un índice válido indica que la cuenta fue encontrada.
-            _accounts[index] = entity;
-        }
+        _context.BankAccounts.Update(entity);
     }
 
     // Elimina todas las cuentas cuyo número coincida con el de la entidad recibida.
     public void Delete(BankAccount entity)
     {
-        _accounts.RemoveAll(account => account.Number == entity.Number);
+        _context.BankAccounts.Remove(entity);
     }
 
 // Fin de la clase BankAccountRepository.
