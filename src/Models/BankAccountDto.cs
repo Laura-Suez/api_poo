@@ -4,11 +4,11 @@ namespace api_poo.Models;
 
 // DTO significa Data Transfer Object (objeto de transferencia de datos).
 // Se usa para decidir qué información sale de la API. En este caso exponemos
-// solamente Number y Owner, y no enviamos toda la entidad ni sus transacciones.
+// solamente Number, Owner y Balance, y no enviamos toda la entidad ni sus transacciones.
 //
 // 'record' genera una clase orientada a transportar datos y recibe sus valores
-// mediante este constructor primario: string Number y string Owner.
-public record BankAccountDto(string Number, string Owner)
+// mediante este constructor primario: string Number, string Owner y decimal Balance.
+public record BankAccountDto(string Number, string Owner, decimal Balance)
 {
     // Método fábrica: transforma una entidad de dominio en el DTO que devuelve
     // el controlador al cliente HTTP.
@@ -16,7 +16,8 @@ public record BankAccountDto(string Number, string Owner)
     {
         var dto = new BankAccountDto(
                     entity.Number,
-                    entity.Owner
+                    entity.Owner,
+                    entity.Balance
                 );
 
         return dto;

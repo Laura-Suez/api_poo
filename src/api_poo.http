@@ -29,6 +29,18 @@ Accept: application/json
 
 ###
 
-GET {{api_poo_HostAddress}}/Account/1234567891
+POST {{api_poo_HostAddress}}/Transfer
+Content-Type: application/json
+Accept: application/json
+
+{
+	"sourceAccountNumber": "1234567890",
+	"destinationAccountNumber": "1234567891",
+	"amount": 100
+}
+
+###
+
+GET {{api_poo_HostAddress}}/Account
 Content-Type: application/json
 Accept: application/json

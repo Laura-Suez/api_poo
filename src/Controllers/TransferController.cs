@@ -13,9 +13,9 @@ namespace api_poo.Controllers;
 [Route("[controller]")]
 public class TransferController : ControllerBase
 {
-	private readonly BankAccountRepository _bankAccountRepository;
+	private readonly IBankAccountRepository _bankAccountRepository;
 
-	public TransferController(BankAccountRepository bankAccountRepository)
+	public TransferController(IBankAccountRepository bankAccountRepository)
 	{
 		_bankAccountRepository = bankAccountRepository;
 	}
