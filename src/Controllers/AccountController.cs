@@ -55,10 +55,10 @@ public class AccountController : ControllerBase
         
     }
 
-    [HttpGet("{prId}")]
-     public ActionResult<BankAccountDto> GetById([FromRoute] int prId)
+    [HttpGet("{accountNumber}")]
+     public ActionResult<BankAccountDto> GetByNumber([FromRoute] string accountNumber)
     {
-        var result =  _bankAccountRepository.GetById(prId);
+        var result =  _bankAccountRepository.GetByNumber(accountNumber);
         
         return BankAccountDto.Create(result);
         

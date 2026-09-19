@@ -11,6 +11,18 @@ Accept: application/json
 
 ###
 
+
+POST {{api_poo_HostAddress}}/Account
+Content-Type: application/json
+Accept: application/json
+
+{
+"owner": "Justin Case",
+"initialBalance": 2000.00
+}
+
+###
+
 GET {{api_poo_HostAddress}}/Account
 Content-Type: application/json
 Accept: application/json

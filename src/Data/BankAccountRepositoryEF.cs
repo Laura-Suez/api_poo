@@ -8,7 +8,7 @@ public class BankAccountRepositoryEF : IBankAccountRepository
 {
     private static List<BankAccount> _accounts = [];
 
-    public BankAccount GetById(int id)
+    public BankAccount GetByNumber(string accountNumber)
     {
         throw new Exception("Not implemented");
     }
