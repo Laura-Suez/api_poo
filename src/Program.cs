@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using api_poo.Entities;
 using api_poo.Models;
 using api_poo.Data; 
+using api_poo.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ builder.Services.AddOpenApi();
 
 // Registrar el servicio en el contenedor de IoC
 builder.Services.AddScoped<IBankAccountRepository, BankAccountRepository>();
+builder.Services.AddScoped<TransferService>();
 
 var app = builder.Build();
 

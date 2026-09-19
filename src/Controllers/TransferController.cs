@@ -4,6 +4,7 @@ using System.Buffers;
 using api_poo.Data;
 using api_poo.Entities;
 using api_poo.Models;
+using api_poo.Services;
 
 namespace api_poo.Controllers;
 
@@ -13,43 +14,27 @@ namespace api_poo.Controllers;
 [Route("[controller]")]
 public class TransferController : ControllerBase
 {
-	private readonly IBankAccountRepository _bankAccountRepository;
+	private readonly TransferService _transferService;
 
-	public TransferController(IBankAccountRepository bankAccountRepository)
+	public TransferController(TransferService transferService)
 	{
-		_bankAccountRepository = bankAccountRepository;
+		_transferService = transferService;
 	}
 
 	[HttpPost]
 	public ActionResult Transfer([FromBody] TransferRequest request)
 	{
-		if (request.Amount <= 0)
-		{
-			return BadRequest("Transfer amount must be positive.");
-		}
-
-		if (request.SourceAccountNumber == request.DestinationAccountNumber)
-		{
-			return BadRequest("Source and destination accounts must be different.");
-		}
-
-		BankAccount sourceAccount;
-		BankAccount destinationAccount;
-
 		try
 		{
-			sourceAccount = _bankAccountRepository.GetByNumber(request.SourceAccountNumber);
-			destinationAccount = _bankAccountRepository.GetByNumber(request.DestinationAccountNumber);
+			_transferService.Transfer(request);
 		}
 		catch (KeyNotFoundException exception)
 		{
 			return NotFound(exception.Message);
 		}
-
-		try
+		catch (ArgumentOutOfRangeException exception)
 		{
-			sourceAccount.MakeWithdrawal(request.Amount, DateTime.UtcNow, "Transfer");
-			destinationAccount.MakeDeposit(request.Amount, DateTime.UtcNow, "Transfer");
+			return BadRequest(exception.Message);
 		}
 		catch (InvalidOperationException exception)
 		{
