@@ -1,85 +1,67 @@
+using System.ComponentModel.DataAnnotations.Schema;
+using api_poo.Entities;
+
 namespace api_poo.Entities;
 
-// La entidad representa una cuenta bancaria y contiene las reglas de negocio
-// relacionadas con depósitos, retiros y cálculo del saldo.
 public class BankAccount
 {
-   
-    public string Number { get; }
+    // Surrogate primary key. EF needs this.
+    public int Id { get; private set; }
 
-    
-    public string Owner { get; set; }
+    // Was get-only; EF needs to be able to set it. private set is fine.
+    public string Number { get; private set; } = string.Empty;
 
-    // El saldo se calcula a partir de todas las transacciones, en lugar de
-    // almacenarse en una variable independiente que podría quedar desactualizada.
-    public decimal Balance
-    {
-        get
-        {
-            decimal balance = 0;
-            foreach (var item in _allTransactions)
-            {
-                balance += item.Amount;
-            }
+    // Renamed nothing here, but now the domain ctor param is "owner" to match.
+    public string Owner { get; private set; } = string.Empty;
 
-            return balance;
-        }
-    }
+    // Real navigation. EF maps this as a one-to-many with Transaction.
+    public List<Transaction> Transactions { get; private set; } = new();
 
+    // Computed from the navigation, not stored as a column.
+    [NotMapped]
+    public decimal Balance => Transactions.Sum(t => t.Amount);
 
     private static int s_accountNumberSeed = 1234567890;
 
+    // EF Core uses this to materialize rows.
+    private BankAccount() { }
 
-    private List<Transaction> _allTransactions = new List<Transaction>();
-
+    // Your domain constructor, kept for application code.
+    public BankAccount(string owner, decimal initialBalance)
+    {
+        Owner = owner;
+        Number = (s_accountNumberSeed++).ToString();
+        MakeDeposit(initialBalance, DateTime.Now, "Initial balance");
+    }
 
     public void MakeDeposit(decimal amount, DateTime date, string note)
     {
         if (amount <= 0)
-        {
             throw new ArgumentOutOfRangeException(nameof(amount), "Amount of deposit must be positive");
-        }
-        var deposit = new Transaction(amount, date, note);
-        _allTransactions.Add(deposit);
+
+        Transactions.Add(new Transaction(amount, date, note));
     }
 
-   
     public void MakeWithdrawal(decimal amount, DateTime date, string note)
     {
         if (amount <= 0)
-        {
             throw new ArgumentOutOfRangeException(nameof(amount), "Amount of withdrawal must be positive");
-        }
+
         if (Balance - amount < 0)
-        {
             throw new InvalidOperationException("Not sufficient funds for this withdrawal");
-        }
-        var withdrawal = new Transaction(-amount, date, note);
-        _allTransactions.Add(withdrawal);
+
+        Transactions.Add(new Transaction(-amount, date, note));
     }
 
-    // Este es el constructor de la clase. Se ejecuta al crear una cuenta con new.
-    // Recibe los datos mínimos necesarios y deja el objeto en un estado válido.
-    public BankAccount(string name, decimal initialBalance)
-    {
-        Owner = name;
-        MakeDeposit(initialBalance, DateTime.Now, "Initial balance");
+    public virtual void PerformMonthEndTransactions() { }
 
-        Number = s_accountNumberSeed.ToString();
-        s_accountNumberSeed++;
-    }
-
-    // virtual permite que tipos de cuenta derivados redefinan esta operación.
-    public virtual void PerformMonthEndTransactions() {}
-
-    // Construye un informe de texto recorriendo las transacciones en orden.
     public string GetAccountHistory()
     {
         var report = new System.Text.StringBuilder();
-
         decimal balance = 0;
+
         report.AppendLine("Date\t\tAmount\tBalance\tNote");
-        foreach (var item in _allTransactions)
+        foreach (var item in Transactions)
         {
             balance += item.Amount;
             report.AppendLine($"{item.Date.ToShortDateString()}\t{item.Amount}\t{balance}\t{item.Notes}");
@@ -87,6 +69,4 @@ public class BankAccount
 
         return report.ToString();
     }
-
-    // Fin de la clase BankAccount.
 }
