@@ -5,6 +5,7 @@ using api_poo.Models;
 using api_poo.Data; 
 using Microsoft.EntityFrameworkCore;
 using api_poo.Services;
+using Microsoft.Data.Sqlite;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,10 +19,27 @@ builder.Services.AddScoped<TransferService>();
 
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+var connection = new SqliteConnection("Data Source=Bank.db");
+connection.Open();
+
+// Set journal mode to DELETE using PRAGMA statement
+using (var command = connection.CreateCommand())
+{
+    command.CommandText = "PRAGMA journal_mode = DELETE;";
+    command.ExecuteNonQuery();
+}
+
+builder.Services.AddDbContext<AppDbContext>(dbContextOptions => dbContextOptions.UseSqlite(connection));
 
 var app = builder.Build();
+
+#region Apply EF migrations
+using (var serviceScopescope = app.Services.CreateScope())
+{
+    var dbContext = serviceScopescope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate();
+}
+#endregion
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -38,7 +38,6 @@ public class AccountController : ControllerBase
 
         // El controlador utiliza la abstracción del repositorio para guardar la cuenta.
         _bankAccountRepository.Add(new_bankAccount);
-
         // Se transforma la entidad a DTO antes de enviarla al cliente.
         return BankAccountDto.Create(new_bankAccount);
         
