@@ -14,7 +14,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 // Registrar el servicio en el contenedor de IoC
-builder.Services.AddScoped<IBankAccountRepository, BankAccountRepository>();
+builder.Services.AddScoped<IBankAccountRepository, BankAccountRepositoryEF>();
 builder.Services.AddScoped<TransferService>();
 
 builder.Services.AddControllersWithViews();

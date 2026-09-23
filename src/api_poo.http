@@ -17,8 +17,8 @@ Content-Type: application/json
 Accept: application/json
 
 {
-"owner": "Justin Case",
-"initialBalance": 2000.00
+"owner": "Justin Case 2",
+"initialBalance": 3000.00
 }
 
 ###
