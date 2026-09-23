@@ -20,14 +20,13 @@ public class BankAccountRepository : IBankAccountRepository
         _context = context;
     }
 
-    // Busca una cuenta por su número. Aunque el método recibe un int, la entidad
-    // guarda Number como string, por eso convertimos el id a texto para comparar.
+    // Busca una cuenta por su número.
     // Si no existe una cuenta, se lanza una excepción en lugar de devolver null,
     // porque el contrato de la interfaz declara un BankAccount no nullable.
-    public BankAccount GetById(int id)
+    public BankAccount GetByNumber(string accountNumber)
     {
-        return _context.BankAccounts.FirstOrDefault(account => account.Number == id.ToString())
-            ?? throw new KeyNotFoundException($"Bank account con id {id}  not found.");
+        return _accounts.FirstOrDefault(account => account.Number == accountNumber)
+            ?? throw new KeyNotFoundException($"Bank account {accountNumber} not found.");
     }
 
     // Devuelve una copia de la lista. ToList evita entregar directamente la lista

@@ -6,8 +6,8 @@ namespace api_poo.Interfaces;
 // repositorio, pero no explica cómo se implementa cada operación.
 public interface IBankAccountRepository
 {
-    // Busca una cuenta usando su identificador.
-    BankAccount GetById(int id);
+    // Busca una cuenta usando su número.
+    BankAccount GetByNumber(string accountNumber);
 
     // Devuelve todas las cuentas disponibles.
     List<BankAccount> List();
